@@ -2,25 +2,37 @@
 FROM golang:alpine AS builder
 RUN apk --update add ca-certificates
 WORKDIR /app
-COPY . ./
-RUN go mod tidy -diff
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o gatus .
+# Builder stage
 
-# Run Tests inside docker image if you don't have a configured go environment
-#RUN apk update && apk add --virtual build-dependencies build-base gcc
-#RUN go test ./... -mod vendor
+# Pull golang and alpine base image using image digests
+FROM golang:alpine3.24 AS builder
 
-# Run the binary on an empty container
-FROM scratch
-COPY --from=builder /app/gatus .
-COPY --from=builder /app/config.yaml ./config/config.yaml
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-ENV GATUS_CONFIG_PATH=""
-ENV GATUS_LOG_LEVEL="INFO"
-ENV PORT="8080"
-EXPOSE ${PORT}
-ENTRYPOINT ["/gatus"]
+# Creating working space.
+WORKDIR /app
 
+# Copy dependencies to the container first to optimise Docker layer cache.
+COPY go.mod go.sum ./
+
+# Download dependencies.
+RUN go mod download
+
+# Copy application to app.
+COPY . .
+
+# Build the application as a standalone static Go binary and save it as app-gatus.
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o app-gatus .
+
+# Runtime stage
+FROM gcr.io/distroless/static-debian13:nonroot
+
+COPY --from=builder /app/app-gatus /app-gatus
+COPY --from=builder /app/config.yaml /config/config.yaml
+
+ENV GATUS_CONFIG_PATH=/config/config.yaml
+
+EXPOSE 8080
+
+ENTRYPOINT ["/app-gatus"]
 
 
 
