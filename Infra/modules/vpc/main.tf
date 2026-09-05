@@ -29,4 +29,4 @@ resource "aws_subnet" "subnets" {
   tags = {
     Name = "gatus-${each.key}-subnet"
   }
-}
+} 
