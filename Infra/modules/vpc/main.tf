@@ -30,3 +30,25 @@ resource "aws_subnet" "subnets" {
     Name = "gatus-${each.key}-subnet"
   }
 } 
+
+# Create the Internet Gateway
+resource "aws_internet_gateway" "gatus_igw" {
+  # Internet Gateway: "Attach me to the Gatus VPC."
+  vpc_id = aws_vpc.gatus_vpc.id
+
+  tags = {
+    Name = var.internet_gateway_name
+  }
+}
+
+# Give private resources outbound access to the internet
+resource "aws_nat_gateway" "gatus_nat_gateway" {
+  vpc_id = aws_vpc.gatus_vpc.id
+
+  availability_mode = var.availability_mode
+  connectivity_type = var.connectivity_type
+
+  tags = {
+    Name = var.nat_gateway_name
+  }
+}
