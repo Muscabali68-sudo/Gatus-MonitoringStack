@@ -36,3 +36,27 @@ variable "subnets" {
     public_ip         = bool
   }))
 }
+
+# Name tag applied to the Internet Gateway
+variable "internet_gateway_name" {
+  description = "Name tag applied to the Internet Gateway"
+  type        = string
+}
+
+# Name applied to the NAT Gateway
+variable "nat_gateway_name" {
+  description = "Name of the NAT Gateway"
+  type        = string
+}
+
+# Controls whether the NAT Gateway is regional or zonal
+variable "availability_mode" {
+  description = "Availability mode of the NAT Gateway"
+  type        = string
+}
+
+# Controls whether the NAT Gateway uses public or private connectivity
+variable "connectivity_type" {
+  description = "Connectivity type of the NAT Gateway"
+  type        = string
+} 
