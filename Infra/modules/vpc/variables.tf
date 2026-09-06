@@ -60,3 +60,21 @@ variable "connectivity_type" {
   description = "Connectivity type of the NAT Gateway"
   type        = string
 } 
+
+# Name applied to the public route table
+variable "public_route_table_name" {
+  description = "Name of the public route table"
+  type        = string
+}
+
+# Name applied to the private route table
+variable "private_route_table_name" {
+  description = "Name of the private route table"
+  type        = string
+}
+
+# Destination representing all IPv4 addresses
+variable "route_destination_cidr_block" {
+  description = "Destination CIDR block used by the internet routes"
+  type        = string
+}
