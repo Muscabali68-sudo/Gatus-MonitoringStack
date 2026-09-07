@@ -1,0 +1,58 @@
+# ============================================================
+# ALB SECURITY GROUP
+# ============================================================
+
+# Create the security group used by the Application Load Balancer
+resource "aws_security_group" "alb" {
+  name        = var.alb_security_group_name
+  description = var.alb_security_group_description
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = var.alb_security_group_name
+  }
+}
+
+
+# ============================================================
+# ALB INBOUND RULES
+# ============================================================
+
+# Allow HTTP traffic for the future HTTPS redirect
+resource "aws_vpc_security_group_ingress_rule" "alb_http" {
+  security_group_id = aws_security_group.alb.id
+
+  cidr_ipv4   = var.alb_ingress_cidr
+  from_port   = var.http_port
+  to_port     = var.http_port
+  ip_protocol = var.tcp_protocol
+}
+
+
+# Allow secure HTTPS traffic from the internet
+resource "aws_vpc_security_group_ingress_rule" "alb_https" {
+  security_group_id = aws_security_group.alb.id
+
+  cidr_ipv4   = var.alb_ingress_cidr
+  from_port   = var.https_port
+  to_port     = var.https_port
+  ip_protocol = var.tcp_protocol
+}
+
+# ============================================================
+# ALB OUTBOUND RULE
+# ============================================================
+
+# Allow the ALB to pass requests to the Gatus ECS tasks
+resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
+  # Add this outbound rule to the ALB security group
+  security_group_id = aws_security_group.alb.id
+
+  # Only allow traffic going to the ECS task security group
+  referenced_security_group_id = aws_security_group.ecs_task.id
+
+  # Gatus listens on TCP port 8080
+  from_port   = var.application_port
+  to_port     = var.application_port
+  ip_protocol = var.tcp_protocol
+} 
