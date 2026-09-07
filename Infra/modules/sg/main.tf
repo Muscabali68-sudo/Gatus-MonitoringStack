@@ -56,3 +56,50 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
   to_port     = var.application_port
   ip_protocol = var.tcp_protocol
 } 
+
+# ============================================================
+# ECS TASK SECURITY GROUP
+# ============================================================
+
+# Protect the Gatus application running inside ECS Fargate
+resource "aws_security_group" "ecs_task" {
+  name        = var.ecs_security_group_name
+  description = var.ecs_security_group_description
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = var.ecs_security_group_name
+  }
+}
+# ============================================================
+# ECS INBOUND RULE
+# ============================================================
+
+# Only allow the ALB to reach Gatus on port 8080
+resource "aws_vpc_security_group_ingress_rule" "ecs_from_alb" {
+  # Add this rule to the ECS security group
+  security_group_id = aws_security_group.ecs_task.id
+
+  # Only accept traffic coming from the ALB security group
+  referenced_security_group_id = aws_security_group.alb.id
+
+  from_port   = var.application_port
+  to_port     = var.application_port
+  ip_protocol = var.tcp_protocol
+} 
+
+# ============================================================
+# ECS OUTBOUND RULE TO EFS
+# ============================================================
+
+# Allow the ECS tasks to connect to EFS on port 2049
+resource "aws_vpc_security_group_egress_rule" "ecs_to_efs" {
+  security_group_id = aws_security_group.ecs_task.id
+
+  # Only allow storage traffic going to the EFS security group
+  referenced_security_group_id = aws_security_group.efs.id
+
+  from_port   = var.efs_port
+  to_port     = var.efs_port
+  ip_protocol = var.tcp_protocol
+}

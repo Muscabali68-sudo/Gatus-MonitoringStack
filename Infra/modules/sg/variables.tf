@@ -54,3 +54,24 @@ variable "application_port" {
   description = "Port used by the Gatus application"
   type        = number
 }
+
+# ============================================================
+# ECS TASK SECURITY GROUP VARIABLES
+# ============================================================
+
+# Name applied to the ECS task security group
+variable "ecs_security_group_name" {
+  description = "Name of the ECS task security group"
+  type        = string
+}
+
+# Description applied to the ECS task security group
+variable "ecs_security_group_description" {
+  description = "Description of the ECS task security group"
+  type        = string
+}
+# Port used by EFS for NFS connections
+variable "efs_port" {
+  description = "Port used by EFS for NFS traffic"
+  type        = number
+}
