@@ -75,3 +75,19 @@ variable "efs_port" {
   description = "Port used by EFS for NFS traffic"
   type        = number
 }
+
+# ============================================================
+# EFS SECURITY GROUP VARIABLES
+# ============================================================
+
+# Name applied to the EFS security group
+variable "efs_security_group_name" {
+  description = "Name of the EFS security group"
+  type        = string
+}
+
+# Description applied to the EFS security group
+variable "efs_security_group_description" {
+  description = "Description of the EFS security group"
+  type        = string
+}

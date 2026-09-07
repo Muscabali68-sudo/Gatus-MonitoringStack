@@ -103,3 +103,37 @@ resource "aws_vpc_security_group_egress_rule" "ecs_to_efs" {
   to_port     = var.efs_port
   ip_protocol = var.tcp_protocol
 }
+
+# ============================================================
+# EFS SECURITY GROUP
+# ============================================================
+
+# Create the security group used by the EFS mount targets
+resource "aws_security_group" "efs" {
+  name        = var.efs_security_group_name
+  description = var.efs_security_group_description
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = var.efs_security_group_name
+  }
+}
+
+
+# ============================================================
+# EFS INBOUND RULE
+# ============================================================
+
+# Allow EFS connections only from the ECS tasks
+resource "aws_vpc_security_group_ingress_rule" "efs_from_ecs" {
+  # Add this inbound rule to the EFS security group
+  security_group_id = aws_security_group.efs.id
+
+  # Only accept connections from the ECS security group
+  referenced_security_group_id = aws_security_group.ecs_task.id
+
+  # EFS uses NFS over TCP port 2049
+  from_port   = var.efs_port
+  to_port     = var.efs_port
+  ip_protocol = var.tcp_protocol
+}
