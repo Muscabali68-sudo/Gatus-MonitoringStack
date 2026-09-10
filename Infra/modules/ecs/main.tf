@@ -84,3 +84,44 @@ container_definitions = jsonencode([
   }
 ])
 
+# ============================================================
+# EFS TASK VOLUME
+# ============================================================
+
+volume {
+  name = var.efs_volume_name
+
+  efs_volume_configuration {
+    file_system_id = var.efs_file_system_id
+
+    # Mount the root of this dedicated Gatus file system
+    root_directory = "/"
+
+    # IAM authorization requires transit encryption
+    transit_encryption = "ENABLED"
+
+    # Use the ECS Task Role when mounting EFS
+    authorization_config {
+      iam = "ENABLED"
+    }
+  }
+} 
+
+# ======================================================
+# GATUS EFS CONTAINER MOUNT
+# ======================================================
+
+# Mount the EFS task volume inside the main Gatus container
+mountPoints = [
+  {
+    # Must match the name in the volume block
+    sourceVolume = var.efs_volume_name
+
+    # Location where EFS appears inside the container
+    containerPath = var.efs_container_path
+
+    # Gatus needs permission to write persistent data
+    readOnly = false
+  }
+] 
+
