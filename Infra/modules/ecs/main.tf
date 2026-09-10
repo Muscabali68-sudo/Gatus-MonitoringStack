@@ -50,9 +50,10 @@ resource "aws_ecs_task_definition" "gatus" {
   task_role_arn = var.task_role_arn
 
   # Match the ARM64 container image used in the ClickOps setup
+  
   runtime_platform {
-    operating_system_family = "LINUX"
-    cpu_architecture        = "ARM64"
+    operating_system_family = var.operating_system_family
+    cpu_architecture        = var.cpu_architecture
   }
 
   # Describe the container that should run inside the task
