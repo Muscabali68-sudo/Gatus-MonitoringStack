@@ -125,3 +125,67 @@ mountPoints = [
   }
 ] 
 
+# ============================================================
+# ECS SERVICE
+# ============================================================
+
+# Keep the requested number of Gatus Fargate tasks running
+resource "aws_ecs_service" "gatus" {
+  name = var.ecs_service_name
+
+  # Place the service inside the Gatus ECS cluster
+  cluster = aws_ecs_cluster.gatus.id
+
+  # Tell the service which task blueprint to run
+  task_definition = aws_ecs_task_definition.gatus.arn
+
+  # Control how many Gatus tasks should run
+  desired_count = var.desired_task_count
+
+  # Use the same Fargate platform version as the ClickOps setup
+  platform_version = var.fargate_platform_version
+
+  # Run the tasks using the Fargate capacity provider
+  capacity_provider_strategy {
+    capacity_provider = var.capacity_provider
+    weight            = var.capacity_provider_weight
+    base              = var.capacity_provider_base
+  }
+
+  # ==========================================================
+  # ECS SERVICE NETWORKING
+  # ==========================================================
+
+  network_configuration {
+    # Place the Fargate tasks in both private subnets
+    subnets = values(var.private_subnet_ids)
+
+    # Protect the tasks with the ECS Task Security Group
+    security_groups = [var.ecs_security_group_id]
+
+    # Keep the tasks private without public IP addresses
+    assign_public_ip = false
+  }
+
+  tags = {
+    Name = var.ecs_service_name
+  }
+} 
+
+  # ==========================================================
+  # ECS SERVICE LOAD BALANCER
+  # ==========================================================
+
+  # Register the Gatus tasks with the ALB Target Group
+  load_balancer {
+    target_group_arn = var.target_group_arn
+
+    # These must match the Task Definition container
+    container_name = var.container_name
+    container_port = var.application_port
+  }
+
+  tags = {
+    Name = var.ecs_service_name
+  }
+}
