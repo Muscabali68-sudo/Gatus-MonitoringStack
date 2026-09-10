@@ -12,6 +12,20 @@ resource "aws_ecs_cluster" "gatus" {
 }
 
 # ============================================================
+# CLOUDWATCH LOG GROUP
+# ============================================================
+
+# Create the CloudWatch location where Gatus logs will be stored
+resource "aws_cloudwatch_log_group" "gatus" {
+  name              = var.cloudwatch_log_group_name
+  retention_in_days = var.log_retention_days
+
+  tags = {
+    Name = var.cloudwatch_log_group_name
+  }
+}
+
+# ============================================================
 # ECS TASK DEFINITION
 # ============================================================
 
@@ -42,24 +56,31 @@ resource "aws_ecs_task_definition" "gatus" {
   }
 
   # Describe the container that should run inside the task
-  container_definitions = jsonencode([
-    {
-      name      = var.container_name
-      image     = var.container_image
-      essential = true
+container_definitions = jsonencode([
+  {
+    name      = var.container_name
+    image     = var.container_image
+    essential = true
 
-      # Gatus accepts requests on port 8080
-      portMappings = [
-        {
-          containerPort = var.application_port
-          hostPort      = var.application_port
-          protocol      = "tcp"
-        }
-      ]
+    # Gatus accepts requests on port 8080
+    portMappings = [
+      {
+        containerPort = var.application_port
+        hostPort      = var.application_port
+        protocol      = "tcp"
+      }
+    ]
+
+    # Send the Gatus container logs to CloudWatch
+    logConfiguration = {
+      logDriver = "awslogs"
+
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.gatus.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = var.log_stream_prefix
+      }
     }
-  ])
-
-  tags = {
-    Name = var.task_definition_family
   }
-}
+])
+
