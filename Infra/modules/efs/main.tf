@@ -18,15 +18,23 @@ resource "aws_efs_file_system" "gatus" {
   # Automatically scale throughput based on the workload
   throughput_mode = var.efs_throughput_mode
 
-  # Move files that have not been accessed for 30 days into IA
+  # Move unused files to Infrequent Access
   lifecycle_policy {
     transition_to_ia = var.transition_to_ia
+  }
 
-    # Move files that have not been accessed for 90 days into Archive
+  # Move older unused files to Archive
+  lifecycle_policy {
     transition_to_archive = var.transition_to_archive
+  }
 
-    # Null means files do not automatically return to Standard
-    transition_to_primary_storage_class = var.transition_to_standard
+  # Skip this rule when the value is null
+  dynamic "lifecycle_policy" {
+    for_each = var.transition_to_standard == null ? [] : [var.transition_to_standard]
+
+    content {
+      transition_to_primary_storage_class = lifecycle_policy.value
+    }
   }
 
   tags = {
