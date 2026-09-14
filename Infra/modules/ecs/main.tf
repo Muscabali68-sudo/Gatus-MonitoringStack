@@ -117,9 +117,9 @@ resource "aws_ecs_task_definition" "gatus" {
 resource "aws_ecs_service" "gatus" {
   name = var.ecs_service_name
 
-  cluster         = aws_ecs_cluster.gatus.id
-  task_definition = aws_ecs_task_definition.gatus.arn
-  desired_count   = var.desired_task_count
+  cluster          = aws_ecs_cluster.gatus.id
+  task_definition  = aws_ecs_task_definition.gatus.arn
+  desired_count    = var.desired_task_count
   platform_version = var.fargate_platform_version
 
   capacity_provider_strategy {
