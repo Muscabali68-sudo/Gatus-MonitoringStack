@@ -1,10 +1,16 @@
-# Terraform working directories
-**/.terraform/*
+# Terraform downloaded providers, modules and cache
+**/.terraform/
 
-# Terraform state
+# Terraform provider lock files
+**/.terraform.lock.hcl
+
+# Terraform state and backups
 *.tfstate
 *.tfstate.*
 
-# Terraform plans
+# Saved Terraform plans
 *.tfplan
 tfplan
+
+# Terraform operation and crash files
+.terraform.tfstate.lock.info   
