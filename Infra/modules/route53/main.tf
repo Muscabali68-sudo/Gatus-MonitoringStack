@@ -34,11 +34,19 @@ resource "aws_route53domains_registered_domain" "gatus" {
   }
 }
 
-resource "aws_route53_record" "gatus_alb" {
-  zone_id = var.hosted_zone_id
-  name    = var.domain_name
-  type    = "A"
+# ============================================================
+# ALB ALIAS RECORD
+# ============================================================
 
+# Point the domain to the Application Load Balancer
+resource "aws_route53_record" "gatus_alb" {
+  # Create the record inside the hosted zone created above
+  zone_id = aws_route53_zone.gatus.zone_id
+
+  name = var.domain_name
+  type = "A"
+
+  # AWS handles the changing ALB IP addresses for us
   alias {
     name                   = var.alb_dns_name
     zone_id                = var.alb_zone_id
