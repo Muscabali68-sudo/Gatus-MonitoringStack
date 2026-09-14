@@ -1,7 +1,4 @@
-# Build the go application into a binary
-FROM golang:alpine AS builder
-RUN apk --update add ca-certificates
-WORKDIR /app
+
 # Builder stage
 
 # Pull golang and alpine base image using image digests
