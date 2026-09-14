@@ -59,7 +59,7 @@ variable "availability_mode" {
 variable "connectivity_type" {
   description = "Connectivity type of the NAT Gateway"
   type        = string
-} 
+}
 
 # Name applied to the public route table
 variable "public_route_table_name" {

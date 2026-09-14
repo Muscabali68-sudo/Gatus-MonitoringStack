@@ -29,7 +29,7 @@ resource "aws_subnet" "subnets" {
   tags = {
     Name = "gatus-${each.key}-subnet"
   }
-} 
+}
 
 # Create the Internet Gateway
 resource "aws_internet_gateway" "gatus_igw" {
@@ -105,7 +105,7 @@ resource "aws_route" "private_internet_access" {
   route_table_id = aws_route_table.private.id
 
   destination_cidr_block = var.route_destination_cidr_block
-  nat_gateway_id         = aws_nat_gateway.nat_gateway.id
+  nat_gateway_id         = aws_nat_gateway.gatus_nat_gateway.id
 }
 
 # Connect every private subnet to the private route table
