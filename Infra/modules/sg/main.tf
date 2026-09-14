@@ -55,7 +55,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
   from_port   = var.application_port
   to_port     = var.application_port
   ip_protocol = var.tcp_protocol
-} 
+}
 
 # ============================================================
 # ECS TASK SECURITY GROUP
@@ -86,7 +86,7 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_from_alb" {
   from_port   = var.application_port
   to_port     = var.application_port
   ip_protocol = var.tcp_protocol
-} 
+}
 
 # ============================================================
 # ECS OUTBOUND RULE TO EFS
@@ -102,6 +102,13 @@ resource "aws_vpc_security_group_egress_rule" "ecs_to_efs" {
   from_port   = var.efs_port
   to_port     = var.efs_port
   ip_protocol = var.tcp_protocol
+}
+# Allow ECS tasks to reach the internet through the NAT Gateway
+resource "aws_vpc_security_group_egress_rule" "ecs_outbound" {
+  security_group_id = aws_security_group.ecs_task.id
+
+  cidr_ipv4   = var.ecs_outbound_cidr
+  ip_protocol = "-1"
 }
 
 # ============================================================

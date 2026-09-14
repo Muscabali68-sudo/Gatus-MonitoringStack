@@ -75,6 +75,10 @@ variable "efs_port" {
   description = "Port used by EFS for NFS traffic"
   type        = number
 }
+variable "ecs_outbound_cidr" {
+  description = "IPv4 CIDR block allowed for ECS outbound traffic"
+  type        = string
+}
 
 # ============================================================
 # EFS SECURITY GROUP VARIABLES
