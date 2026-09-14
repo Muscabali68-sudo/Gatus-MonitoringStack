@@ -15,6 +15,7 @@ module "ecr" {
   image_tag_mutability = var.ecr_image_tag_mutability
   scan_on_push         = var.ecr_scan_on_push
   encryption_type      = var.ecr_encryption_type
+  force_delete         = var.ecr_force_delete
 }
 
 module "oidc" {

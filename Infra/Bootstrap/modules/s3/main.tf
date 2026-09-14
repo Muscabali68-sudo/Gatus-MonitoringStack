@@ -2,8 +2,8 @@
 
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
-  
-   force_destroy = true
+
+  force_destroy = true
 
   tags = {
     Name = var.name_tag
@@ -56,3 +56,13 @@ resource "aws_s3_bucket_ownership_controls" "bucket_ownership" {
 
 
 # custom-kms encryption add 
+
+# for prudction
+# resource "aws_s3_bucket" "bucket" {
+#   bucket        = var.bucket_name
+#   force_destroy = false
+
+#   lifecycle {
+#     prevent_destroy = true
+#   }
+# }

@@ -21,3 +21,8 @@ variable "encryption_type" {
   description = "Encryption type used for images in the ECR repository"
   type        = string
 }
+
+variable "force_delete" {
+  description = "Allow deletion of the ECR repository when it contains images"
+  type        = bool
+}

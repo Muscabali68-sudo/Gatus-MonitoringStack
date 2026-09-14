@@ -43,6 +43,12 @@ variable "ecr_repository_name" {
   type        = string
   default     = "gatus-app-repo"
 }
+# Allow the test ECR repository and its images to be destroyed
+variable "ecr_force_delete" {
+  description = "Allow deletion of the ECR repository when it contains images"
+  type        = bool
+  default     = true
+}
 
 # Controls whether image tags can be overwritten
 variable "ecr_image_tag_mutability" {
