@@ -1,0 +1,73 @@
+# Name shown in the GitHub Actions page
+name: Terraform CI
+
+on:
+  # Run automatically whenever I push code to main
+  push:
+    branches:
+      - main
+
+  # Let me start it manually from GitHub Actions
+  workflow_dispatch:
+
+
+  # Allow the workflow to read the repository
+permissions:
+  contents: read
+
+# Group runs by workflow name and branch
+# When I push newer code, cancel the older run if it is still running
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+  # Tell Terraform that a pipeline is running its commands
+env:
+  TF_IN_AUTOMATION: "true"
+
+  # Define the work GitHub should perform
+jobs:
+  terraform-lint:
+    name: Terraform checks
+
+    # Run the checks on a GitHub-hosted Ubuntu machine
+    runs-on: ubuntu-24.04
+
+    # Stop the job if it takes longer than 15 minutes
+    timeout-minutes: 15
+
+        # Run shell commands inside the main infrastructure folder
+    defaults:
+      run:
+        shell: bash
+        working-directory: Infra
+    
+    steps:
+      # Download the repository so the runner can check our code
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false 
+
+          # Install the Terraform version used by our project
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: "1.15.6"
+          terraform_wrapper: false
+
+                # Check the root files and modules without changing them
+      - name: Check Terraform formatting
+        run: |
+          terraform fmt -check -diff
+          terraform fmt -check -diff -recursive modules
+
+                # Download providers and modules without connecting to S3 state
+      - name: Initialize Terraform for validation
+        run: terraform init -backend=false -input=false
+
+              # Check that the Terraform configuration is internally valid
+      - name: Validate Terraform configuration
+        run: terraform validate -no-color 
+
+        
