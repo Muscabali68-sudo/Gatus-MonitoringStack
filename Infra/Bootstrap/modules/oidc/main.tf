@@ -81,6 +81,7 @@ resource "aws_iam_role_policy" "build_push" {
         # GitHub Actions: "Let me upload the Docker image layers."
         Action = [
           "ecr:BatchCheckLayerAvailability",
+          "ecr:DescribeImages",
           "ecr:BatchGetImage",
           "ecr:CompleteLayerUpload",
           "ecr:InitiateLayerUpload",
