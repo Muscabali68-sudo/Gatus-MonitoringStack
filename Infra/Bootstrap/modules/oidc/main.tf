@@ -160,7 +160,8 @@ resource "aws_iam_role_policy" "deployment" {
           "logs:*",
           "acm:*",
           "route53:*",
-          "ecr:DescribeRepositories"
+          "ecr:DescribeRepositories",
+          "ecr:DescribeImages"
         ]
 
         Resource = "*"
