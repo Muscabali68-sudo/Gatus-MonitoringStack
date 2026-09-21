@@ -1,6 +1,5 @@
 name: Build and Push
 
-# Start after the Terraform checks finish on main
 on:
   workflow_run:
     workflows:
@@ -14,9 +13,8 @@ jobs:
   build-push:
     name: Build and push Gatus image
 
-    # Continue only when Terraform CI succeeds
     if: github.event.workflow_run.conclusion == 'success'
-
+    
     # Use an ARM64 runner to match our ECS task
     runs-on: ubuntu-24.04-arm
 
