@@ -1,11 +1,11 @@
 # Name shown in the GitHub Actions page
 name: Terraform CI
 
-# on:
-#   # Run automatically whenever I push code to main
-#   push:
-#     branches:
-#       - main
+on:
+  # Run automatically whenever I push code to main
+  push:
+    branches:
+      - main
 
   # Let me start it manually from GitHub Actions
   workflow_dispatch:
