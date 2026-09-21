@@ -1,0 +1,63 @@
+name: Terraform Destroy
+
+# Gör att workflowet ENDAST kan startas manuellt via GitHub Actions-fliken
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform-destroy:
+    name: Terraform Destroy
+    runs-on: ubuntu-24.04
+
+    # Tillåt upp till en timme för att riva ner infrastrukturen
+    timeout-minutes: 60
+
+    permissions:
+      # Tillåt checkout att läsa koden
+      contents: read
+      # Tillåt jobbbet att hämta OIDC-token för AWS-autentisering
+      id-token: write
+
+    # Tillåt endast en infrastruktur-operation åt gången
+    concurrency:
+      group: gatus-infra
+      cancel-in-progress: false
+
+    # Kör alla kommandon inuti din infrastruktur-mapp
+    defaults:
+      run:
+        shell: bash
+        working-directory: Infra
+
+    env:
+      TF_IN_AUTOMATION: "true"
+
+    steps:
+      # Ladda ner koden från main-branchen
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Installera samma Terraform-version som dina andra workflows
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: "1.15.6"
+          terraform_wrapper: false
+
+      # Logga in på AWS med din deployment-roll
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
+        with:
+          role-to-assume: arn:aws:iam::244306245751:role/github-actions-deployment-role
+          aws-region: eu-central-1
+          role-session-name: github-terraform-destroy
+
+      # Initiera Terraform och anslut till din S3 state backend
+      - name: Initialize Terraform
+        run: terraform init -input=false
+
+      # Kör destroy automatiskt utan att fråga efter manuell bekräftelse i terminalen
+      - name: Terraform Destroy
+        run: terraform destroy -input=false -no-color -lock-timeout=5m -auto-approve
