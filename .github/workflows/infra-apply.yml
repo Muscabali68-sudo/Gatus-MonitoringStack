@@ -56,6 +56,20 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false 
+      
+      - name: Download image tag
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: deployment-image-tag
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # LÄS IN TAGGEN: Matchar din Terraform-variabel container_image_tag
+      - name: Read image tag
+        run: |
+          IMAGE_TAG=$(cat image-tag.txt)
+          echo "TF_VAR_container_image_tag=$IMAGE_TAG" >> "$GITHUB_ENV"
+
 
      # Install the same Terraform version used by our checks
       - name: Install Terraform
