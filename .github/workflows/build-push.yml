@@ -46,6 +46,14 @@ jobs:
           ref: ${{ env.IMAGE_TAG }}
           persist-credentials: false
 
+    
+      - name: Debug OIDC Token Claims
+        run: |
+          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r '.value')
+          echo "=== DIN DEKODADE TOKEN ==="
+          echo $TOKEN | cut -d'.' -f2 | base64 -d 2>/dev/null | jq .
+          echo "==========================
+
       # Use our build-and-push role to get temporary AWS credentials
       - name: Authenticate to AWS
         uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
