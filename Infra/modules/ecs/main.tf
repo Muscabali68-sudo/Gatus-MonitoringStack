@@ -1,4 +1,16 @@
 # ============================================================
+# DATA SOURCES (Hämtar automatiskt den senaste bilden från ECR)
+# ============================================================
+data "aws_ecr_repository" "gatus_repo" {
+  name = "gatus-app-repo"
+}
+
+data "aws_ecr_image" "latest_gatus_image" {
+  repository_name = data.aws_ecr_repository.gatus_repo.name
+  most_recent     = true
+}
+
+# ============================================================
 # ECS CLUSTER
 # ============================================================
 
@@ -51,7 +63,7 @@ resource "aws_ecs_task_definition" "gatus" {
   container_definitions = jsonencode([
     {
       name      = var.container_name
-      image     = var.container_image
+      image     = "${data.aws_ecr_repository.gatus_repo.repository_url}:${data.aws_ecr_image.latest_gatus_image.image_tags[0]}"
       essential = true
 
       # Gatus accepts requests on port 8080
