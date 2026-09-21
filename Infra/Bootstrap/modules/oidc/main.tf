@@ -159,7 +159,8 @@ resource "aws_iam_role_policy" "deployment" {
           "elasticfilesystem:*",
           "logs:*",
           "acm:*",
-          "route53:*"
+          "route53:*",
+          "ecr:DescribeRepositories"
         ]
 
         Resource = "*"
