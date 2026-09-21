@@ -56,53 +56,6 @@ resource "aws_iam_role" "build_push" {
   })
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-
-#     Statement = [
-#       {
-#         Effect = "Allow"
-
-#         # AWS: "I trust tokens from this GitHub OIDC provider."
-#         Principal = {
-#           Federated = aws_iam_openid_connect_provider.github_actions.arn
-#         }
-
-#         # GitHub: "Give me temporary AWS credentials for this role."
-#         Action = "sts:AssumeRoleWithWebIdentity"
-
-#         Condition = {
-#           StringEquals = {
-#             # AWS: "The token must be created for AWS STS."
-#             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-
-#             # AWS: "The token must come from this repository and branch."
-#             "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${var.github_branch}"
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
-
-
 # Permissions policy: What can the build-and-push role do?
 resource "aws_iam_role_policy" "build_push" {
   name = var.build_push_policy_name
@@ -170,12 +123,14 @@ resource "aws_iam_role" "deployment" {
         Action = "sts:AssumeRoleWithWebIdentity"
 
         Condition = {
+          # AWS: "The token must be created for AWS STS."
           StringEquals = {
-            # AWS: "The token must be created for AWS STS."
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          }
 
-            # AWS: "The token must come from this repository and branch."
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${var.github_branch}"
+          # AWS: "The token must come from your specific repository, allowing GitHub IDs."
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:Muscabali68-sudo*/Gatus-MonitoringStack*"
           }
         }
       }
