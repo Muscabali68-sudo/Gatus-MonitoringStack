@@ -32,7 +32,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: github-build-push
 
-
       - name: Log in to Amazon ECR 
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
@@ -64,15 +63,4 @@ jobs:
           docker build --platform linux/arm64 --tag "$IMAGE_URI" ./gatus
           docker push "$IMAGE_URI" 
 
-      - name: Save image tag for deployment
-        shell: bash
-        run: |
-          mkdir -p "$RUNNER_TEMP/deployment"
-          printf '%s\n' "$IMAGE_TAG" > "$RUNNER_TEMP/deployment/image-tag.txt"
 
-      - name: Upload image tag artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
-        with:
-          name: deployment-image-tag
-          path: ${{ runner.temp }}/deployment/image-tag.txt
-          retention-days: 1
