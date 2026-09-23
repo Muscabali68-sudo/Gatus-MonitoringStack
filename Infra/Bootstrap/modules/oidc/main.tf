@@ -210,9 +210,21 @@ resource "aws_iam_role_policy" "deployment" {
           "iam:ListRolePolicies",
           "iam:TagRole",
           "iam:UntagRole",
+          "iam:ListInstanceProfilesForRole",
           "iam:PassRole"
         ]
 
+        Resource = "*"
+      },
+
+      {
+        Effect = "Allow"
+        Action = [
+          "route53domains:GetDomainDetail",
+          "route53domains:ListTagsForDomain",
+          "route53domains:UpdateDomainNameservers",
+          "route53domains:GetOperationDetail"
+        ]
         Resource = "*"
       }
     ]
